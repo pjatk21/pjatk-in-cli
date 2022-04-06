@@ -12,6 +12,10 @@
   "bin": {
     "pjcli": "./dist/index.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pjatk21/pjatk-in-cli"
+  },
   "devDependencies": {
     "@types/luxon": "^2.3.1",
     "@types/node": "17",
