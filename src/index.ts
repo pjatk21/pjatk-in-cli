@@ -6,10 +6,12 @@ import prompts from 'prompts'
 import 'reflect-metadata'
 import { AltapiClient } from './altapi'
 import { DateTime } from 'luxon'
+import { entriesAsTable } from './utils'
 
 interface ConfigSchema {
   groups: string[]
   apiService: string
+  olaMode?: boolean
 }
 
 const config = new Conf<ConfigSchema>({
@@ -24,11 +26,15 @@ const config = new Conf<ConfigSchema>({
 const client = new AltapiClient()
 
 yargs(hideBin(process.argv))
+  .middleware(() => {
+    if (config.get('olaMode')) console.log('✨Have a nice day Ola!✨')
+  })
   .command(
     'init',
     'Initalize CLI tool',
-    (y) => y,
-    async () => {
+    (y) => y.option('theOlaMode', { hidden: true, type: 'boolean' }),
+    async ({ theOlaMode }) => {
+      if (theOlaMode) config.set('olaMode', true)
       const { groupsAvailable } = await client.getGroups()
 
       const r = await prompts({
@@ -46,7 +52,7 @@ yargs(hideBin(process.argv))
     }
   )
   .command(
-    'today',
+    'now',
     'Get schedule for next 24h',
     (y) => y,
     async () => {
@@ -55,18 +61,33 @@ yargs(hideBin(process.argv))
         DateTime.now(),
         DateTime.now().plus({ day: 1 })
       )
-      console.table(
-        Object.fromEntries(
-          entries
-            .sort()
-            .map(({ begin, end, name, room, tutor, type }) => [
-              begin.toLocaleString({ timeStyle: 'short' }) +
-                ' - ' +
-                end.toLocaleString({ timeStyle: 'short' }),
-              { name, room, type, tutor },
-            ])
-        )
+      entriesAsTable(entries)
+    }
+  )
+  .command(
+    'today',
+    'Get schedule for today',
+    (y) => y,
+    async () => {
+      const { entries } = await client.getSchedule(
+        config.get('groups'),
+        DateTime.now().startOf('day'),
+        DateTime.now().endOf('day')
       )
+      entriesAsTable(entries)
+    }
+  )
+  .command(
+    'tomorrow',
+    'Get schedule for tomorrow',
+    (y) => y,
+    async () => {
+      const { entries } = await client.getSchedule(
+        config.get('groups'),
+        DateTime.now().plus({ day: 1 }).startOf('day'),
+        DateTime.now().plus({ day: 1 }).endOf('day')
+      )
+      entriesAsTable(entries)
     }
   )
   .parse()
