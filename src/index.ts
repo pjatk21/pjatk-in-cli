@@ -48,7 +48,7 @@ yargs(hideBin(process.argv))
         })),
       })
       config.set('groups', r.groups)
-      console.log('Nowa konfiguracja', config.store)
+      console.log('Nowa konfiguracja', config.store, config.path)
     }
   )
   .command(
@@ -90,5 +90,4 @@ yargs(hideBin(process.argv))
       entriesAsTable(entries)
     }
   )
-  .showHelp()
   .parse()
