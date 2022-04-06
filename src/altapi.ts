@@ -49,7 +49,7 @@ export class AltapiClient {
     const params = new URLSearchParams()
     params.set('from', begin.toISO())
     params.set('to', end.toISO())
-    for (const group of groups) params.set('groups', group)
+    for (const group of groups) params.append('groups', group)
     return plainToClass(
       AltapiSchedule,
       await this.http
