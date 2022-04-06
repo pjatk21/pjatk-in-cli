@@ -90,4 +90,5 @@ yargs(hideBin(process.argv))
       entriesAsTable(entries)
     }
   )
+  .showHelp()
   .parse()
