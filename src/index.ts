@@ -1,4 +1,4 @@
-#!/usr/bin/env node --disable-proto=delete --experimental-json-modules --no-warnings --experimental-specifier-resolution=node
+#!/usr/bin/env -S node --disable-proto=delete --experimental-json-modules --no-warnings --experimental-specifier-resolution=node
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 import Conf from 'conf'
