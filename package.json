@@ -42,5 +42,8 @@
   "scripts": {
     "prepublish": "tsc",
     "cli.dev": "node --no-warnings --experimental-specifier-resolution=node --loader ts-node/esm src/index.ts"
+  },
+  "engines": {
+    "node": ">=17"
   }
 }
