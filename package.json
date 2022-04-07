@@ -1,6 +1,6 @@
 {
   "name": "pjatk-in-cli",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "CLI app for schedule",
   "main": "dist/index.js",
   "files": [
