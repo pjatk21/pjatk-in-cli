@@ -31,7 +31,7 @@ function hasGroupsConfigured() {
     throw new Error(`No groups set! Use pjcli init to configure them.`)
 }
 
-yargs(hideBin(process.argv))
+const parser = yargs(hideBin(process.argv))
   .middleware(() => {
     if (config.get('olaMode')) console.log('✨Have a nice day Ola!✨')
   })
@@ -123,6 +123,13 @@ yargs(hideBin(process.argv))
             .toHuman()}`
         )
       }
-    }
+    },
+    [hasGroupsConfigured]
   )
-  .parse()
+  .fail(false)
+
+try {
+  await parser.parse()
+} catch (e) {
+  if (e instanceof Error) console.log(e.name, '->', chalk.red(e.message))
+}
