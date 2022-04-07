@@ -1,4 +1,4 @@
-#!/usr/bin/env node --disable-proto=delete --no-warnings --experimental-specifier-resolution=node
+#!/usr/bin/env node --disable-proto=delete --experimental-json-modules --no-warnings --experimental-specifier-resolution=node
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 import Conf from 'conf'
@@ -8,7 +8,9 @@ import { AltapiClient } from './altapi'
 import { DateTime } from 'luxon'
 import { entriesAsTable } from './utils'
 import chalk from 'chalk'
-import { version } from '../package.json'
+const pkgJson = await import('../package.json', {
+  assert: { type: 'json' },
+})
 
 interface ConfigSchema {
   groups: string[]
@@ -33,7 +35,7 @@ function hasGroupsConfigured() {
 }
 
 const parser = yargs(hideBin(process.argv))
-  .version(version)
+  .version(pkgJson.default.version)
   .middleware(() => {
     if (config.get('olaMode')) console.log('✨Have a nice day Ola!✨')
   })
@@ -128,6 +130,7 @@ const parser = yargs(hideBin(process.argv))
     },
     [hasGroupsConfigured]
   )
+  .demandCommand()
   .fail(false)
 
 try {
