@@ -8,6 +8,7 @@ import { AltapiClient } from './altapi'
 import { DateTime } from 'luxon'
 import { entriesAsTable } from './utils'
 import chalk from 'chalk'
+import { version } from '../package.json'
 
 interface ConfigSchema {
   groups: string[]
@@ -32,6 +33,7 @@ function hasGroupsConfigured() {
 }
 
 const parser = yargs(hideBin(process.argv))
+  .version(version)
   .middleware(() => {
     if (config.get('olaMode')) console.log('✨Have a nice day Ola!✨')
   })
