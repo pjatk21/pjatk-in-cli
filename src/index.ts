@@ -7,16 +7,15 @@ import 'reflect-metadata'
 import { AltapiClient } from './altapi'
 import { DateTime } from 'luxon'
 import { entriesAsTable } from './utils'
+import chalk from 'chalk'
 
 interface ConfigSchema {
   groups: string[]
-  apiService: string
   olaMode?: boolean
 }
 
 const config = new Conf<ConfigSchema>({
   defaults: {
-    apiService: 'https://altapi.kpostek.dev',
     groups: [],
   },
   configName: 'pjcli',
@@ -24,6 +23,13 @@ const config = new Conf<ConfigSchema>({
 })
 
 const client = new AltapiClient()
+
+// middlewares
+
+function hasGroupsConfigured() {
+  if (config.get('groups').length === 0)
+    throw new Error(`No groups set! Use pjcli init to configure them.`)
+}
 
 yargs(hideBin(process.argv))
   .middleware(() => {
@@ -48,7 +54,7 @@ yargs(hideBin(process.argv))
         })),
       })
       config.set('groups', r.groups)
-      console.log('Nowa konfiguracja', config.store, config.path)
+      console.log('Nowa konfiguracja', { ...config.store }, config.path)
     }
   )
   .command(
@@ -62,7 +68,8 @@ yargs(hideBin(process.argv))
         DateTime.now().plus({ day: 1 })
       )
       entriesAsTable(entries)
-    }
+    },
+    [hasGroupsConfigured]
   )
   .command(
     'today',
@@ -75,7 +82,8 @@ yargs(hideBin(process.argv))
         DateTime.now().endOf('day')
       )
       entriesAsTable(entries)
-    }
+    },
+    [hasGroupsConfigured]
   )
   .command(
     'tomorrow',
@@ -88,6 +96,33 @@ yargs(hideBin(process.argv))
         DateTime.now().plus({ day: 1 }).endOf('day')
       )
       entriesAsTable(entries)
+    },
+    [hasGroupsConfigured]
+  )
+  .command(
+    'next',
+    'Prints overall status',
+    (y) => y,
+    async () => {
+      const { entries } = await client.getSchedule(
+        config.get('groups'),
+        DateTime.now(),
+        DateTime.now().endOf('day')
+      )
+      console.log(`Pozostało ${chalk.bold(entries.length)} zajęć`)
+      if (entries[0]) {
+        const ne = entries[0]
+        console.log(
+          `Kolejne zajęcia to ${chalk.bold(ne.code)} (${chalk.bold(
+            ne.type === 'Wykład'
+              ? chalk.bgGreenBright(ne.type)
+              : chalk.bgBlueBright(ne.type + ` w sali ${ne.room}`)
+          )}) za ${ne.begin
+            .diffNow()
+            .shiftTo('hours', 'minutes', 'seconds')
+            .toHuman()}`
+        )
+      }
     }
   )
   .parse()

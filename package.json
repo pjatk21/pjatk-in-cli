@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@types/prompts": "^2.0.14",
+    "chalk": "^5.0.1",
     "class-transformer": "^0.5.1",
     "conf": "^10.1.2",
     "got": "^12.0.3",
