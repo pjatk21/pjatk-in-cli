@@ -42,7 +42,6 @@
   },
   "scripts": {
     "prepublishOnly": "yarn build",
-    "install": "yarn build",
     "build": "rimraf dist && tsc",
     "cli.dev": "node --no-warnings --experimental-specifier-resolution=node --loader ts-node/esm src/index.ts"
   },
